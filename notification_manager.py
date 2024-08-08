@@ -19,8 +19,6 @@ class NotificationManager:
         # Prints if successfully sent.
         print(message.sid)
 
-    # Is SMS not working for you or prefer whatsapp? Connect to the WhatsApp Sandbox!
-    # https://console.twilio.com/us1/develop/sms/try-it-out/whatsapp-learn
     def send_whatsapp(self, message_body):
         message = self.client.messages.create(
             from_=f'whatsapp:{os.environ["TWILIO_WHATSAPP_NUMBER"]}',
