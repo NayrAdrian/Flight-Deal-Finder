@@ -7,6 +7,8 @@ load_dotenv()
 
 SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/b237e38ca30d773f18ac9108cc89a109/flightDeals/prices"
 PUT_SHEETY_PRICES_ENDPOINT = "https://api.sheety.co/b237e38ca30d773f18ac9108cc89a109/flightDeals/prices/IATA Code"
+
+
 class DataManager:
 
     def __init__(self):
@@ -22,7 +24,6 @@ class DataManager:
         self.destination_data = data["prices"]
         return self.destination_data
 
-
     def update_destination_codes(self):
         for city in self.destination_data:
             new_data = {
@@ -35,3 +36,4 @@ class DataManager:
                 auth=self.authorization,
                 json=new_data
             )
+            print(response.text)
