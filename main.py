@@ -2,7 +2,7 @@ import time
 from datetime import datetime, timedelta
 from data_manager import DataManager
 from flight_search import FlightSearch
-from flight_data import FlightData  # Correct class import
+from flight_data import find_cheapest_flight
 from notification_manager import NotificationManager
 
 # ==================== Set up the Flight Search ====================
@@ -20,39 +20,48 @@ ORIGIN_CITY_IATA = "MNL"
 for row in sheet_data:
     if row["iataCode"] == "":
         row["iataCode"] = flight_search.get_destination_code(row["city"])
-        # Slowing down requests to avoid rate limit
+        # slowing down requests to avoid rate limit
         time.sleep(2)
 print(f"sheet_data:\n {sheet_data}")
 
 data_manager.destination_data = sheet_data
 data_manager.update_destination_codes()
 
-# ==================== Search for Flights ====================
+# ==================== Search for Flights and Send Notifications ====================
 
 tomorrow = datetime.now() + timedelta(days=1)
 six_month_from_today = datetime.now() + timedelta(days=(6 * 30))
 
 for destination in sheet_data:
-    print(f"Getting flights for {destination['city']}...")
+    print(f"Getting direct flights for {destination['city']}...")
     flights = flight_search.check_flights(
         ORIGIN_CITY_IATA,
         destination["iataCode"],
         from_time=tomorrow,
         to_time=six_month_from_today
     )
-    if flights:
-        cheapest_flight = FlightData.find_cheapest_flight(flights)
-        if cheapest_flight.price != "N/A" and float(cheapest_flight.price) < float(destination.get("lowestPrice", float('inf'))):
-            print(f"Lower price flight found to {destination['city']}!")
-            # Send notifications if a cheaper flight is found
-            # Ensure notification_manager is properly initialized
-            notification_manager.send_whatsapp(
-                message_body=f"Low price alert! Only £{cheapest_flight.price} to fly "
-                             f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
-                             f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
-            )
-    else:
-        print(f"No flight data available for {destination['city']}.")
-
+    cheapest_flight = find_cheapest_flight(flights)
+    print(f"{destination['city']}: ₱{cheapest_flight.price}")
     # Slowing down requests to avoid rate limit
     time.sleep(2)
+
+    # ==================== Search for indirect flight if N/A ====================
+
+    if cheapest_flight.price == "N/A":
+        print(f"No direct flight to {destination['city']}. Looking for indirect flights...")
+        stopover_flights = flight_search.check_flights(
+            ORIGIN_CITY_IATA,
+            destination["iataCode"],
+            from_time=tomorrow,
+            to_time=six_month_from_today,
+            is_direct=False
+        )
+        cheapest_flight = find_cheapest_flight(stopover_flights)
+        print(f"Cheapest indirect flight price is: £{cheapest_flight.price}")
+        notification_manager.send_whatsapp(
+            message_body=f"Low price alert! Only ₱{cheapest_flight.price} to fly "
+                         f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
+                         f"on {cheapest_flight.out_date} until {cheapest_flight.return_date}."
+        )
+
+
