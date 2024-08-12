@@ -27,6 +27,12 @@ print(f"sheet_data:\n {sheet_data}")
 data_manager.destination_data = sheet_data
 data_manager.update_destination_codes()
 
+# ==================== Retrieve your customer emails ====================
+
+customer_data = data_manager.get_customer_emails()
+customer_email_list = [row["whatIsYourEmail?"] for row in customer_data]
+print(f"Your email list includes {customer_email_list}")
+
 # ==================== Search for Flights and Send Notifications ====================
 
 tomorrow = datetime.now() + timedelta(days=1)
@@ -57,7 +63,7 @@ for destination in sheet_data:
             is_direct=False
         )
         cheapest_flight = find_cheapest_flight(stopover_flights)
-        print(f"Cheapest indirect flight price is: £{cheapest_flight.price}")
+        print(f"Cheapest indirect flight price is: ₱{cheapest_flight.price}")
         notification_manager.send_whatsapp(
             message_body=f"Low price alert! Only ₱{cheapest_flight.price} to fly "
                          f"from {cheapest_flight.origin_airport} to {cheapest_flight.destination_airport}, "
