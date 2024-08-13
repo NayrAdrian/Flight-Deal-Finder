@@ -31,8 +31,8 @@ class FlightSearch:
         response = requests.post(url=TOKEN_ENDPOINT, headers=header, data=body)
 
         # New bearer token. Typically expires in 1799 seconds (30min)
-        print(f"Your token is {response.json()['access_token']}")
-        print(f"Your token expires in {response.json()['expires_in']} seconds")
+        # print(f"Your token is {response.json()['access_token']}")
+        # print(f"Your token expires in {response.json()['expires_in']} seconds")
         return response.json()['access_token']
 
     def get_destination_code(self, city_name):

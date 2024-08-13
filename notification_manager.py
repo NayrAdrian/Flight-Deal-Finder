@@ -20,7 +20,7 @@ class NotificationManager:
             body=message_body,
             to=os.environ["TWILIO_VIRTUAL_NUMBER"]
         )
-        print(message.sid)
+        # print(message.sid)
 
     def send_whatsapp(self, message_body):
         message = self.client.messages.create(
@@ -28,7 +28,7 @@ class NotificationManager:
             body=message_body,
             to=f'whatsapp:{self.twilio_verified_number}'
         )
-        print(message.sid)
+        # print(message.sid)
 
     def send_emails(self, email_list, email_body):
         with self.connection:

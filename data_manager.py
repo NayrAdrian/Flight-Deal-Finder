@@ -38,7 +38,7 @@ class DataManager:
                 json=new_data,
                 auth=self._authorization
             )
-            print(response.text)
+            # print(response.text)
 
     def get_customer_emails(self):
         response = requests.get(url=self.users_endpoint, auth=self._authorization)
