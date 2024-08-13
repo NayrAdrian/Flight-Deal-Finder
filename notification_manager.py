@@ -2,7 +2,6 @@ import smtplib
 import os
 from twilio.rest import Client
 
-
 class NotificationManager:
 
     def __init__(self):
@@ -12,7 +11,6 @@ class NotificationManager:
         self.twilio_virtual_number = os.environ["TWILIO_VIRTUAL_NUMBER"]
         self.twilio_verified_number = os.environ["TWILIO_VERIFIED_NUMBER"]
         self.whatsapp_number = os.environ["TWILIO_WHATSAPP_NUMBER"]
-        # Set up Twilio Client and SMTP connection
         self.client = Client(os.environ['TWILIO_SID'], os.environ["TWILIO_AUTH_TOKEN"])
         self.connection = smtplib.SMTP(os.environ["EMAIL_PROVIDER_SMTP_ADDRESS"])
 
